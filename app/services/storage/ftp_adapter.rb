@@ -32,7 +32,11 @@ module Storage
         remote_path = File.join(@root, key)
         Tempfile.create("ftp-download") do |file|
           file.binmode
-          ftp.getbinaryfile(remote_path, file.path)
+          begin
+            ftp.getbinaryfile(remote_path, file.path)
+          rescue Net::FTPPermError
+            raise Errno::ENOENT
+          end
           return File.binread(file.path)
         end
       end

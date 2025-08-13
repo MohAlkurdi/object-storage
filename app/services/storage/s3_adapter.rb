@@ -2,6 +2,7 @@ require "openssl"
 require "base64"
 require "net/http"
 require "uri"
+require "digest"
 
 module Storage
   class S3Adapter
@@ -40,10 +41,10 @@ module Storage
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = uri.scheme == "https"
       response = http.request(request)
-      unless response.code.to_i.between?(200, 299)
-        raise "S3 GET failed: #{response.code} #{response.body}"
-      end
-      response.body
+      code = response.code.to_i
+      return response.body if code.between?(200, 299)
+      raise Errno::ENOENT if code == 404
+      raise "S3 GET failed: #{response.code} #{response.body}"
     end
 
     private
@@ -53,7 +54,7 @@ module Storage
       t = Time.now.utc
       amz_date = t.strftime("%Y%m%dT%H%M%SZ")
       datestamp = t.strftime("%Y%m%d")
-      canonical_uri = uri.request_uri
+      canonical_uri = uri.path
       canonical_querystring = ""
       canonical_headers = "host:#{uri.host}\n" \
                           "x-amz-content-sha256:#{payload_sha256}\n" \
