@@ -1,0 +1,2 @@
+class BlobBody < ApplicationRecord
+end
