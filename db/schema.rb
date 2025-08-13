@@ -10,19 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_13_153141) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_13_154000) do
   create_table "blob_bodies", force: :cascade do |t|
-    t.string "key"
-    t.binary "data"
+    t.string "key", null: false
+    t.binary "data", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_blob_bodies_on_key", unique: true
   end
 
   create_table "stored_blobs", force: :cascade do |t|
-    t.string "key"
-    t.integer "size"
-    t.string "backend"
+    t.string "key", null: false
+    t.integer "size", null: false
+    t.string "backend", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_stored_blobs_on_key", unique: true
   end
 end
