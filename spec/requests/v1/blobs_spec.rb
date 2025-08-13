@@ -18,7 +18,7 @@ RSpec.describe "V1::Blobs API", type: :request do
       body = JSON.parse(response.body)
       expect(body["id"]).to eq("foo/123")
       expect(Base64.strict_decode64(body["data"]).bytes).to eq("hello world".bytes)
-      expect(body["size"]).to eq(11)
+      expect(body["size"]).to eq("11")
       expect(body["created_at"]).to be_present
       expect(StoredBlob.find_by(key: "foo/123")).to be_present
       expect(BlobBody.find_by(key: "foo/123")).to be_present
@@ -45,7 +45,18 @@ RSpec.describe "V1::Blobs API", type: :request do
       body = JSON.parse(response.body)
       expect(body["id"]).to eq("baz")
       expect(Base64.strict_decode64(body["data"]).bytes).to eq("xyz".bytes)
-      expect(body["size"]).to eq(3)
+      expect(body["size"]).to eq("3")
+    end
+
+    it "supports path-style id with slashes" do
+      payload = { id: "a/b/c", data: Base64.strict_encode64("path") }
+      post "/v1/blobs", params: payload.to_json, headers: headers
+      get "/v1/blobs/a/b/c", headers: headers
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["id"]).to eq("a/b/c")
+      expect(Base64.strict_decode64(body["data"]).bytes).to eq("path".bytes)
+      expect(body["size"]).to eq("4")
     end
 
     it "returns 404 for missing blob" do

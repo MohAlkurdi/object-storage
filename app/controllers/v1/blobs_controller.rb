@@ -19,7 +19,7 @@ class V1::BlobsController < V1::BaseController
   def show
     key = params[:id]
     record = StoredBlob.find_by!(key: key)
-    data = Storage::Client.adapter.get(key: key)
+    data = Storage::Client.for_backend(record.backend).get(key: key)
     render json: serialize_blob(record: record, data: data)
   rescue Errno::ENOENT
     render json: { error: "not_found" }, status: :not_found
@@ -31,9 +31,8 @@ class V1::BlobsController < V1::BaseController
     {
       id: record.key,
       data: Base64.strict_encode64(data),
-      size: data.bytesize,
+      size: data.bytesize.to_s,
       created_at: record.created_at.utc.iso8601
     }
   end
 end
-

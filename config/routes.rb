@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   namespace :v1, defaults: { format: :json } do
-    resources :blobs, only: [:create, :show], param: :id
+    resources :blobs, only: [:create], param: :id
   end
+  get "v1/blobs/*id", to: "v1/blobs#show", defaults: { format: :json }
 end

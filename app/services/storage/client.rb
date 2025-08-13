@@ -2,6 +2,11 @@ module Storage
   class Client
     def self.adapter
       backend = ENV.fetch("STORAGE_BACKEND", "db").to_s.downcase
+      for_backend(backend)
+    end
+
+    def self.for_backend(backend)
+      backend = backend.to_s.downcase
       case backend
       when "db"
         Storage::DatabaseAdapter.new
