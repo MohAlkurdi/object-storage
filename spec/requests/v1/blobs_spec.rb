@@ -65,4 +65,3 @@ RSpec.describe "V1::Blobs API", type: :request do
     end
   end
 end
-
